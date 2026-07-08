@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investigation: REPLACE WITH SHORT TITLE</title>
+<style>
+  /*
+    Standalone bug-investigation report.
+    - Everything is inline: no external CSS, fonts, scripts, or images.
+    - Fill each section from the evidence log. Delete sections that do not apply.
+    - Severity: set the badge class to one of
+      severity-critical | severity-high | severity-medium | severity-low
+  */
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --text: #1c2330;
+    --muted: #5b6577;
+    --border: #e2e6ec;
+    --accent: #2b59ff;
+    --code-bg: #0f1729;
+    --code-text: #e6ebf5;
+    --crit: #c0264a;
+    --high: #d9741a;
+    --med: #b8930b;
+    --low: #2f8f5b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 880px;
+    margin: 40px auto;
+    padding: 0 24px 64px;
+  }
+  header.report {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+  }
+  header.report h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    line-height: 1.25;
+  }
+  .subtitle { color: var(--muted); margin: 0 0 20px; }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+  .severity-critical { background: var(--crit); }
+  .severity-high     { background: var(--high); }
+  .severity-medium   { background: var(--med); }
+  .severity-low      { background: var(--low); }
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px 24px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .meta div { font-size: 14px; }
+  .meta dt { color: var(--muted); margin-bottom: 2px; }
+  .meta dd { margin: 0; font-weight: 600; }
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 20px;
+  }
+  section h2 {
+    margin: 0 0 14px;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section h2::before {
+    content: "";
+    width: 4px; height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  p { margin: 0 0 12px; }
+  ol.timeline { margin: 0; padding-left: 20px; }
+  ol.timeline li { margin-bottom: 10px; }
+  code {
+    background: #eef1f6;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: #eef2ff;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+  }
+  .callout.root-cause { border-color: var(--crit); background: #fdeef1; }
+  table.env { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.env th, table.env td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  table.env th { color: var(--muted); font-weight: 600; width: 200px; }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 28px; }
+  @media print {
+    body { background: #fff; }
+    section, header.report { border: none; padding: 0 0 18px; }
+    pre { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="report">
+    <span class="badge severity-high"><!-- set severity class + label -->High</span>
+    <h1>REPLACE: one-line description of the bug</h1>
+    <p class="subtitle">REPLACE: the symptom in a sentence.</p>
+    <dl class="meta">
+      <div><dt>Date</dt><dd>YYYY-MM-DD</dd></div>
+      <div><dt>Investigator</dt><dd>Name</dd></div>
+      <div><dt>Affected version</dt><dd>commit / release</dd></div>
+      <div><dt>Environment</dt><dd>production / staging</dd></div>
+      <div><dt>Status</dt><dd>Diagnosed / Fixed</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>Problem</h2>
+    <p>REPLACE: what is wrong, who reported it, and when it started.</p>
+  </section>
+
+  <section>
+    <h2>Severity &amp; impact</h2>
+    <p>REPLACE: users affected, data/financial risk, frequency, workaround. State
+       the chosen severity and one-line justification.</p>
+  </section>
+
+  <section>
+    <h2>Environment</h2>
+    <table class="env">
+      <tr><th>Version / commit</th><td>REPLACE</td></tr>
+      <tr><th>Environment</th><td>REPLACE</td></tr>
+      <tr><th>Configuration</th><td>REPLACE relevant flags/config</td></tr>
+      <tr><th>Data conditions</th><td>REPLACE what data triggers it</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Reproduction</h2>
+    <ol class="timeline">
+      <li>REPLACE: step 1</li>
+      <li>REPLACE: step 2 &rarr; observed failure</li>
+    </ol>
+    <p>REPLACE: if not reproducible, say so and what that implies.</p>
+  </section>
+
+  <section>
+    <h2>Investigation timeline</h2>
+    <ol class="timeline">
+      <li>REPLACE: what you checked &rarr; what it told you.</li>
+      <li>REPLACE: include dead ends — they show the reasoning.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Evidence</h2>
+    <p>Code path — <code>src/Order/OrderService.php:142</code>:</p>
+    <pre><code>// REPLACE with the relevant code excerpt</code></pre>
+    <p>Query and result:</p>
+    <pre><code>-- REPLACE with the query run
+SELECT ... ;
+-- result: REPLACE (redact PII/secrets)</code></pre>
+  </section>
+
+  <section>
+    <h2>Diagnosis — root cause</h2>
+    <div class="callout root-cause">
+      <strong>Root cause:</strong> REPLACE — the actual cause, not the first
+      plausible line.
+    </div>
+    <p>REPLACE: explain the why-chain — how this cause produces the observed symptom.</p>
+  </section>
+
+  <section>
+    <h2>Fix</h2>
+    <p>REPLACE: the fix, proposed or applied.</p>
+    <pre><code>// REPLACE with the fix / diff</code></pre>
+    <p><strong>Verification:</strong> REPLACE — reproduction now passes, regression
+       test added, suite green.</p>
+  </section>
+
+  <section>
+    <h2>Prevention &amp; follow-ups</h2>
+    <ul>
+      <li>REPLACE: how to stop this class of bug recurring (guard, type, test, lint).</li>
+      <li>REPLACE: follow-up tickets or recommendations.</li>
+    </ul>
+  </section>
+
+  <footer>Generated investigation report — REPLACE title · YYYY-MM-DD</footer>
+
+</div>
+</body>
+</html>

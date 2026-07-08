@@ -1,0 +1,20 @@
+{
+  "name": "ai-skills",
+  "owner": {
+    "name": "Sanctuum"
+  },
+  "metadata": {
+    "description": "Sanctuum's engineering skill set for Claude Code — orchestration, workflows, standards, and the Symfony stack.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "engineering-powerhouse",
+      "source": "./",
+      "description": "Orchestration core, flagship workflows, standards & design skills, and the Symfony stack — 32 composable skills.",
+      "version": "0.1.0",
+      "category": ["workflow", "development", "code-quality"],
+      "keywords": ["symfony", "php", "code-review", "refactoring", "testing"]
+    }
+  ]
+}

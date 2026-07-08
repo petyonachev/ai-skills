@@ -1,0 +1,21 @@
+{
+  "name": "engineering-powerhouse",
+  "version": "0.1.0",
+  "description": "Self-contained engineering skill set: an orchestration core (plan / parallel-agents / iterate / verify), flagship workflows (feature delivery, refactor, debug, integration, code review, ship), standards & design skills, and the Symfony stack.",
+  "author": {
+    "name": "Sanctuum"
+  },
+  "homepage": "https://github.com/petyonachev/ai-skills",
+  "repository": "https://github.com/petyonachev/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "symfony",
+    "php",
+    "doctrine",
+    "code-review",
+    "refactoring",
+    "testing",
+    "workflows",
+    "orchestration"
+  ]
+}
