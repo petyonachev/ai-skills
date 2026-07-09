@@ -77,9 +77,10 @@ Aspect → criteria skill the reviewing agent applies:
 
 ## 4. Dispatch review agents
 
-Fan out one agent per active aspect (`parallel-agents`) so each reviews the whole
-diff through a single, deep lens. For a tiny diff a single pass may cover it — do
-not over-spawn (`parallel-agents` calibration). Brief each agent with:
+Fan out one `code-reviewer` agent per active aspect (`parallel-agents`) so each
+reviews the whole diff through a single, deep lens; it is read-only, so a review
+cannot mutate the code. For a tiny diff a single pass may cover it — do not
+over-spawn (`parallel-agents` calibration). Brief each agent with:
 
 - The exact scope (the diff), the chosen **level and its noise floor**, the aspect
   it owns and the skill(s) to apply, and the finding format below.
@@ -92,8 +93,8 @@ Do not dump raw agent output:
 
 - **Dedupe** issues multiple agents flagged; **merge** overlapping ones.
 - **Cut false positives** — for every Critical/High finding, confirm it is real
-  against the actual code before reporting (an adversarial check via
-  `parallel-agents`/`verify`). A confident-but-wrong finding erodes trust in the
+  against the actual code before reporting (an adversarial check via the
+  `verifier` agent / `verify`). A confident-but-wrong finding erodes trust in the
   whole review.
 - **Sort by severity**, most severe first.
 

@@ -81,9 +81,9 @@ Before you say done, turn on yourself. Ask: *how could this be wrong? what did I
 not run? which path did I assume instead of exercise?* Address what surfaces.
 
 For high-risk or hard-to-reverse work (money, auth, data, public APIs), do not
-rely on your own pass — dispatch independent verifiers whose job is to **refute**
-the claim (`parallel-agents`, adversarial-verify pattern). If a majority cannot
-break it, confidence is earned. If they can, it was not done.
+rely on your own pass — dispatch independent `verifier` agents whose job is to
+**refute** the claim (`parallel-agents`, adversarial-verify pattern). If a
+majority cannot break it, confidence is earned. If they can, it was not done.
 
 ## Reporting completion
 

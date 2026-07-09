@@ -1,7 +1,7 @@
 {
   "name": "engineering-powerhouse",
-  "version": "0.1.0",
-  "description": "Self-contained engineering skill set: an orchestration core (plan / parallel-agents / iterate / verify), flagship workflows (feature delivery, refactor, debug, integration, code review, ship), standards & design skills, and the Symfony stack.",
+  "version": "0.2.0",
+  "description": "Self-contained engineering skill set: an orchestration core (plan / parallel-agents / iterate / verify), flagship workflows (feature delivery, refactor, debug, integration, code review, ship), standards & design skills, and the Symfony stack — plus read-only specialist agents (code-reviewer, verifier, explorer) to fan out to.",
   "author": {
     "name": "Sanctuum"
   },
@@ -16,6 +16,7 @@
     "refactoring",
     "testing",
     "workflows",
-    "orchestration"
+    "orchestration",
+    "agents"
   ]
 }

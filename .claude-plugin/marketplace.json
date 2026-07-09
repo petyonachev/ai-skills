@@ -5,16 +5,16 @@
   },
   "metadata": {
     "description": "Sanctuum's engineering skill set for Claude Code — orchestration, workflows, standards, and the Symfony stack.",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "engineering-powerhouse",
       "source": "./plugins/engineering-powerhouse",
-      "description": "Orchestration core, flagship workflows, standards & design skills, and the Symfony stack — 32 composable skills.",
-      "version": "0.1.0",
+      "description": "Orchestration core, flagship workflows, standards & design skills, and the Symfony stack — 32 composable skills plus 3 read-only specialist agents.",
+      "version": "0.2.0",
       "category": "workflow",
-      "keywords": ["symfony", "php", "code-review", "refactoring", "testing"]
+      "keywords": ["symfony", "php", "code-review", "refactoring", "testing", "agents"]
     }
   ]
 }

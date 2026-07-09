@@ -97,10 +97,18 @@ Return: <the exact shape of the answer you need back>
 Boundaries: <what not to touch; how deep to go>
 ```
 
-Pick the right agent for the job: a read-only search agent (e.g. Explore) for
-"find/understand" questions; a general-purpose agent for multi-step tasks; a
-specialist agent when one matches. For investigation, prefer read-only agents so
-they cannot cause side effects.
+Pick the right agent for the job. This plugin ships three read-only specialists —
+prefer them when the task matches:
+
+- **`explorer`** — "find / understand / map" questions across many files. Returns
+  a cited synthesis, not file dumps.
+- **`code-reviewer`** — one review aspect over a diff (stability, security,
+  cleanliness, tests, performance, architecture) at a given level.
+- **`verifier`** — adversarially refute a specific claim; the independent checker
+  behind `verify` and the adversarial-verify pattern above.
+
+Otherwise use a general-purpose agent for multi-step tasks. For investigation and
+review, prefer these read-only agents so they cannot cause side effects.
 
 ## Write safety and isolation
 

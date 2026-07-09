@@ -58,6 +58,24 @@ behavior and conventions.
 Several skills carry `references/` files for progressive-disclosure depth
 (design-pattern families, Symfony DI/forms, the investigator HTML report template).
 
+## Agents
+
+Three read-only specialist agents in `agents/` give the orchestration core
+purpose-built workers to fan out to (via the `parallel-agents` skill). Each is a
+thin definition wired to the skills — the skill stays the source of truth, the
+agent adds an isolated context, an enforced read-only tool boundary, and a fixed
+stance:
+
+- **`explorer`** — breadth investigation ("how does X work", "where is Y
+  handled"); returns a cited synthesis, not file dumps.
+- **`code-reviewer`** — reviews a diff through one aspect at a chosen level; the
+  dispatch target of the `code-review` workflow's aspect fan-out.
+- **`verifier`** — adversarially refutes a specific claim; the independent checker
+  behind `verify`.
+
+They are picked automatically when a task matches their description, the same way
+skills self-activate.
+
 ## Structure
 
 ```
@@ -65,6 +83,7 @@ Several skills carry `references/` files for progressive-disclosure depth
   plugin.json        # plugin manifest (name, version)
   marketplace.json   # marketplace catalog listing the plugin
 skills/<name>/SKILL.md
+agents/<name>.md     # read-only specialist agents to fan out to
 CLAUDE.md            # optional global operating constitution
 ```
 
