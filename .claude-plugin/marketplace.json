@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "engineering-powerhouse",
-      "source": "./",
+      "source": "./plugins/engineering-powerhouse",
       "description": "Orchestration core, flagship workflows, standards & design skills, and the Symfony stack — 32 composable skills.",
       "version": "0.1.0",
       "category": ["workflow", "development", "code-quality"],
