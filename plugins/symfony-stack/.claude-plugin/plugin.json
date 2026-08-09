@@ -1,0 +1,17 @@
+{
+  "name": "symfony-stack",
+  "version": "0.1.0",
+  "description": "Symfony 7.x / PHP 8.3+ skills: symfony, doctrine, symfony-upgrade, php-upgrade, composer, and Symfony-idiomatic design patterns. Install alongside core in Symfony repos.",
+  "author": {
+    "name": "Sanctuum"
+  },
+  "homepage": "https://github.com/petyonachev/ai-skills",
+  "repository": "https://github.com/petyonachev/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "symfony",
+    "php",
+    "doctrine",
+    "composer"
+  ]
+}

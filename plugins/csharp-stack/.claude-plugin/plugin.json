@@ -1,0 +1,17 @@
+{
+  "name": "csharp-stack",
+  "version": "0.2.0",
+  "description": "C#/.NET skills for NetCord-based Discord bots: conventions, NuGet, NetCord idioms, Unix-socket IPC with a length-prefixed binary protocol. Install alongside core in C# repos.",
+  "author": {
+    "name": "Sanctuum"
+  },
+  "homepage": "https://github.com/petyonachev/ai-skills",
+  "repository": "https://github.com/petyonachev/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "csharp",
+    "dotnet",
+    "netcord",
+    "ipc"
+  ]
+}

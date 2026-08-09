@@ -4,17 +4,41 @@
     "name": "Sanctuum"
   },
   "metadata": {
-    "description": "Sanctuum's engineering skill set for Claude Code — orchestration, workflows, standards, and the Symfony stack.",
-    "version": "0.2.0"
+    "description": "Sanctuum's skill set for Claude Code — a stack-agnostic core plus Symfony, Python, and C# tracks.",
+    "version": "0.5.0"
   },
   "plugins": [
     {
-      "name": "engineering-powerhouse",
-      "source": "./plugins/engineering-powerhouse",
-      "description": "Orchestration core, flagship workflows, standards & design skills, and the Symfony stack — 32 composable skills plus 3 read-only specialist agents.",
-      "version": "0.2.0",
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Orchestration core, flagship workflows, standards & design skills, communication, and meta — stack-agnostic. Install at user scope; always on.",
+      "version": "0.1.0",
       "category": "workflow",
-      "keywords": ["symfony", "php", "code-review", "refactoring", "testing", "agents"]
+      "keywords": ["code-review", "refactoring", "testing", "agents"]
+    },
+    {
+      "name": "symfony-stack",
+      "source": "./plugins/symfony-stack",
+      "description": "Symfony 7.x / PHP 8.3+ skills: symfony, doctrine, symfony-upgrade, php-upgrade, composer. Install at local scope in Symfony repos.",
+      "version": "0.1.0",
+      "category": "stack",
+      "keywords": ["symfony", "php", "doctrine"]
+    },
+    {
+      "name": "python-stack",
+      "source": "./plugins/python-stack",
+      "description": "Python skills for async, real-time, multi-process services: conventions, asyncio, Unix-socket IPC, process supervision, chunked streaming, audio DSP, local model inference, LLM interaction, multi-step decision processes. Install at local scope in Python repos.",
+      "version": "0.3.0",
+      "category": "stack",
+      "keywords": ["python", "async", "asyncio", "ipc", "multiprocessing", "websockets", "audio", "llm"]
+    },
+    {
+      "name": "csharp-stack",
+      "source": "./plugins/csharp-stack",
+      "description": "C#/.NET skills for NetCord-based Discord bots, incl. Unix-socket IPC with a length-prefixed binary protocol. Install at local scope in C# repos.",
+      "version": "0.2.0",
+      "category": "stack",
+      "keywords": ["csharp", "dotnet", "netcord", "ipc"]
     }
   ]
 }

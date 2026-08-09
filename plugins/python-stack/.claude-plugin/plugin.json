@@ -1,0 +1,23 @@
+{
+  "name": "python-stack",
+  "version": "0.3.0",
+  "description": "Python skills for async, real-time, multi-process services (streaming audio/LLM pipelines): conventions, asyncio, Unix-socket IPC, process supervision, chunked streaming, audio DSP, local model inference, LLM interaction, multi-step decision processes, uv, pytest. Install alongside core in Python repos.",
+  "author": {
+    "name": "Sanctuum"
+  },
+  "homepage": "https://github.com/petyonachev/ai-skills",
+  "repository": "https://github.com/petyonachev/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "python",
+    "async",
+    "asyncio",
+    "ipc",
+    "multiprocessing",
+    "websockets",
+    "audio",
+    "llm",
+    "uv",
+    "pytest"
+  ]
+}

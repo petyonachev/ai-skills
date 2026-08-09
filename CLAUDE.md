@@ -1,9 +1,12 @@
 # Operating Constitution
 
-This is the operating guide for a self-contained skill set. Every skill lives in
-`skills/<name>/SKILL.md`. This file is the always-loaded index: it defines *how*
-to work and routes each kind of task to its skill. Deploy it as the global
-`CLAUDE.md` (e.g. `~/.claude/CLAUDE.md`); it references only the skills in this set.
+This is the operating guide for a self-contained skill set, split across a
+stack-agnostic `core` plugin and per-language stack plugins (`symfony-stack`,
+`python-stack`, `csharp-stack`). Every skill lives in
+`plugins/<plugin>/skills/<name>/SKILL.md`. This file is the always-loaded
+index: it defines *how* to work and routes each kind of task to its skill.
+Deploy it as the global `CLAUDE.md` (e.g. `~/.claude/CLAUDE.md`); it
+references only the skills in this set.
 
 ## Core operating philosophy — the powerhouse loop
 
@@ -52,18 +55,24 @@ where a dedicated skill exists.** Skills reference each other by name.
 - Apply or choose a design pattern → `design-patterns`
 - Code smells and refactoring techniques → `refactoring-catalog`
 - Code readability / craft review → `code-quality`
-- Test strategy, TDD, PHPUnit → `testing`
+- Test strategy, TDD, doubles → `testing`
 - Schema, data modeling, indexes, migrations → `database-design`
 - API design (REST/GraphQL), versioning, errors → `api-design`
 - Security review, OWASP, auth, secrets → `security`
 - Performance, N+1, caching, profiling → `performance`
 
-**Symfony stack (Symfony 7.x / PHP 8.3+)**
-- Symfony components and idioms → `symfony`
-- Doctrine ORM/DBAL, mapping, queries → `doctrine`
-- Symfony version upgrade / deprecations → `symfony-upgrade`
-- PHP version upgrade / Rector → `php-upgrade`
-- Composer, dependency updates, audit → `composer`
+**Stack skills (language/framework specifics)**
+- Install the plugin matching each repo, once, at **local** scope:
+  `symfony-stack` (Symfony 7.x/PHP 8.3+: `symfony`, `symfony-patterns`,
+  `doctrine`, `symfony-upgrade`, `php-upgrade`, `composer`), `python-stack`
+  (async/real-time/multi-process Python: `python`, `async-python`,
+  `process-ipc`, `process-supervision`, `chunked-streaming`,
+  `audio-processing`, `python-websockets`, `local-model-inference`,
+  `llm-interaction`, `decision-processes`), `csharp-stack` (NetCord/.NET:
+  `csharp`, incl. Unix-socket IPC matching `process-ipc`). They self-activate
+  for their language same as everything else, and specialize the standards &
+  design skills above with
+  language-specific conventions and worked examples.
 
 **Communication & documentation**
 - PR description → `pr-writer`
@@ -74,17 +83,18 @@ where a dedicated skill exists.** Skills reference each other by name.
 **Meta / setup**
 - Author your global CLAUDE.md, wired to these skills → `global-config`
 
-*(Python stack skills are planned as a future layer.)*
-
 ## Always-on conventions
 
 Detailed in `engineering-standards`; the essentials:
 
-- **Branch**: `PROJ-123-name-of-the-branch` (ticket prefix, kebab-case).
-- **Commit**: `PROJ-123 name of the commit` — ticket prefix, **no colon**,
-  imperative, under 72 chars; body for the *why* on non-trivial changes. **No agent
+- **Branch**: ticket-prefixed and kebab-case if the project has a tracker
+  (`PROJ-123-name-of-the-branch`), otherwise a plain kebab-case description.
+  Symfony-stack repos use the strict ticket-prefix form by convention.
+- **Commit**: same prefix convention as the branch, **no colon**, imperative,
+  under 72 chars; body for the *why* on non-trivial changes. **No agent
   co-author.**
-- **PR**: title under 72 chars; `## Summary` + `## Test Plan`; linked ticket.
+- **PR**: title under 72 chars; `## Summary` + `## Test Plan`; linked ticket if
+  one exists.
 - **Dependencies**: never add, remove, or upgrade without explicit approval; never
   hand-edit lock files.
 - **Definition of done**: `verify` passed at the behavior tier — tests first and

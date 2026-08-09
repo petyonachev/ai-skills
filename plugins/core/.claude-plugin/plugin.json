@@ -1,0 +1,19 @@
+{
+  "name": "core",
+  "version": "0.1.0",
+  "description": "Stack-agnostic engineering skill set: orchestration core (plan / parallel-agents / iterate / verify), flagship workflows (feature delivery, refactor, debug, integration, code review, ship), standards & design skills, communication, and read-only specialist agents (code-reviewer, verifier, explorer) to fan out to.",
+  "author": {
+    "name": "Sanctuum"
+  },
+  "homepage": "https://github.com/petyonachev/ai-skills",
+  "repository": "https://github.com/petyonachev/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "refactoring",
+    "testing",
+    "workflows",
+    "orchestration",
+    "agents"
+  ]
+}
