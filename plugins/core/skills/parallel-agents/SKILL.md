@@ -97,15 +97,18 @@ Return: <the exact shape of the answer you need back>
 Boundaries: <what not to touch; how deep to go>
 ```
 
-Pick the right agent for the job. This plugin ships three read-only specialists —
+Pick the right agent for the job. This plugin ships read-only specialists —
 prefer them when the task matches:
 
 - **`explorer`** — "find / understand / map" questions across many files. Returns
   a cited synthesis, not file dumps.
-- **`code-reviewer`** — one review aspect over a diff (stability, security,
-  cleanliness, tests, performance, architecture) at a given level.
 - **`verifier`** — adversarially refute a specific claim; the independent checker
   behind `verify` and the adversarial-verify pattern above.
+- **`review-<topic>`** (`review-architecture`, `review-reusability`,
+  `review-safety`, `review-scalability`, `review-simplicity`, `review-security`,
+  `review-tests`) — topic reviewers dispatched in pairs by the `code-review`
+  workflow under `code-review-protocol`. Use that workflow rather than
+  dispatching them directly.
 
 Otherwise use a general-purpose agent for multi-step tasks. For investigation and
 review, prefer these read-only agents so they cannot cause side effects.

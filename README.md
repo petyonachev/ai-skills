@@ -33,7 +33,8 @@ See [Configuration scopes](https://code.claude.com/docs/en/settings#configuratio
 for the general mechanism.
 
 Skills self-activate based on the task (e.g. starting a bug fix pulls in
-`debug`); some are also invoked directly as commands, such as `/code-review`.
+`debug`); some are also invoked directly as commands, such as `/core:code-review`
+(namespaced, because Claude Code ships its own built-in `/code-review`).
 
 ## Update
 
@@ -73,7 +74,7 @@ Four plugins in `plugins/`:
   - *Communication* — `pr-writer`, `ticket-writer`, `commit-messages`,
     `investigator`
   - *Meta / setup* — `global-config`
-  - Three read-only specialist agents in `agents/` (see below)
+  - Read-only specialist agents in `agents/` (see below)
 - **`symfony-stack`** — Symfony 7.x/PHP 8.3+, install per Symfony repo:
   `symfony`, `symfony-patterns`, `doctrine`, `symfony-upgrade`, `php-upgrade`,
   `composer`
@@ -95,18 +96,22 @@ template, a PHP-worked-examples appendix for the core design/quality skills).
 
 ## Agents
 
-Three read-only specialist agents in `plugins/core/agents/` give the
-orchestration core purpose-built workers to fan out to (via the
-`parallel-agents` skill). Each is a thin definition wired to the skills — the
-skill stays the source of truth, the agent adds an isolated context, an
-enforced read-only tool boundary, and a fixed stance:
+Read-only specialist agents in `plugins/core/agents/` give the orchestration
+core purpose-built workers to fan out to (via the `parallel-agents` skill).
+Each is a thin definition wired to the skills — the skill stays the source of
+truth, the agent adds an isolated context, an enforced read-only tool boundary,
+and a fixed stance:
 
 - **`explorer`** — breadth investigation ("how does X work", "where is Y
   handled"); returns a cited synthesis, not file dumps.
-- **`code-reviewer`** — reviews a diff through one aspect at a chosen level; the
-  dispatch target of the `code-review` workflow's aspect fan-out.
 - **`verifier`** — adversarially refutes a specific claim; the independent checker
-  behind `verify`.
+  behind `verify`, and the adjudicator of contested `code-review` findings.
+- **Topic reviewers** — `review-architecture`, `review-reusability`,
+  `review-safety`, `review-scalability`, `review-simplicity`,
+  `review-security`, `review-tests`. The `code-review` workflow runs two per
+  topic that cross-examine each other's findings under the shared
+  `code-review-protocol` skill (preloaded into each), so only claims verified
+  against the code reach the report.
 
 They are picked automatically when a task matches their description, the same way
 skills self-activate.

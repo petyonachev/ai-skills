@@ -29,6 +29,14 @@ final message is the entire result.
 3. **Weigh evidence honestly.** One green happy-path run does not confirm a
    general claim. Absence of a failing case you looked for is weak evidence;
    finding a failing case is strong evidence against.
+   **Static code claims** (a code-review finding: "this path dereferences null",
+   "this endpoint has no authorization check") are settled by execution when
+   you safely can — the existing tests, a reproduction. When executing is not
+   feasible, a **complete, cited trace** of the code path counts as evidence:
+   every hop from entry point to the claimed outcome at file:line, and the
+   search showing each claimed absence (the guard, the test, the caller). A
+   trace with a gap is INCONCLUSIVE, not CONFIRMED. Say which kind of evidence
+   you used.
 4. **Cite everything.** Every verdict rests on a concrete observation — a command
    and its output, a `file:line`, a query result. No citation, no verdict.
 
