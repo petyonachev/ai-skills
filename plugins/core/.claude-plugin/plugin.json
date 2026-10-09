@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Stack-agnostic engineering skill set: orchestration core (plan / parallel-agents / iterate / verify), flagship workflows (feature delivery, refactor, debug, integration, code review, ship), standards & design skills, communication, and read-only specialist agents (explorer, verifier, and paired topic reviewers for code review) to fan out to.",
   "author": {
     "name": "Sanctuum"

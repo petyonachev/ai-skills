@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Sanctuum's skill set for Claude Code — a stack-agnostic core plus Symfony, Python, and C# tracks.",
-    "version": "0.6.0"
+    "version": "0.7.0"
   },
   "plugins": [
     {
       "name": "core",
       "source": "./plugins/core",
       "description": "Orchestration core, flagship workflows, standards & design skills, communication, and meta — stack-agnostic. Install at user scope; always on.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "category": "workflow",
       "keywords": ["code-review", "refactoring", "testing", "agents"]
     },

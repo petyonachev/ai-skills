@@ -35,13 +35,21 @@ actual code until only verified claims remain.
 
 The orchestrator gives you a packet directory. Read it before anything else:
 
-- `meta.md` — level, topic list, base and head refs, the exact command that
-  reproduces the diff, detected stack and the stack skills available.
+- `meta.md` — mode (full or re-review), level, topic list, base and head refs,
+  the exact command that reproduces the diff, detected stack and the stack
+  skills available.
 - `intent.md` — what the change is meant to do: user statement, commit
   messages, PR description, ticket. Judge the code against this intent.
 - `files.txt` — changed files with status (A/M/D/R) and line counts, plus the
   files excluded from review (generated, vendored, lockfiles) and why.
-- `diff.patch` — the full diff, the snapshot every reviewer reviews.
+- `diff.patch` — the diff under review, the snapshot every reviewer reviews.
+  In a **re-review** it is the delta since the last reviewed head: the fix
+  commits and anything else that changed after the previous run.
+- `full.patch` — re-review only: the whole change from its base, for context.
+- `previous-review.md` — re-review only: the review record — the issues the
+  previous run reported (**Open**, each being verified separately), what
+  earlier runs **Resolved**, what they **Dropped** or refuted and why, and what
+  the author **Accepted** as won't-fix.
 
 Read all of `diff.patch` (in chunks if large). Then open the post-change files
 themselves — a hunk without its surrounding function is not enough to judge
@@ -74,6 +82,14 @@ Every finding must survive these rules:
    an unchanged query reads). A problem that pre-dates the change and that the
    change does not touch is not a finding — list it under PRE-EXISTING at most
    (max 3, only if serious).
+   In a **re-review**, the change is the delta in `diff.patch`, not the whole
+   branch: code unchanged since the last reviewed head already passed review
+   at this level. A problem in that code is in scope only if the delta changes
+   its behavior, or if it is **failure class at Critical or High** — a defect
+   that can break production is never waved through because an earlier run
+   missed it, and you say in Evidence that it lies outside the delta. Anything
+   else on unchanged code is PRE-EXISTING at most. Read `full.patch` to
+   understand the change; find in `diff.patch`.
 5. **Concrete, not speculative.** A failure-class finding needs a scenario: the
    concrete input, state, or sequence → the observable wrong outcome, on a path
    that is reachable in this codebase today. "If someone later..." is not a
@@ -95,6 +111,14 @@ Every finding must survive these rules:
    never count toward the verdict.
 10. **Silence is a valid result.** There is no quota. "No findings" from a
     careful review is worth more than one invented finding.
+11. **Do not re-litigate the record.** In a re-review, `previous-review.md`
+    is settled ground. Do not raise an item that matches one under Dropped or
+    Accepted by author (same claim about the same code, whatever its line
+    number is now) unless you have evidence that answers the recorded reason —
+    then cite the record entry and the new evidence. Do not re-raise an item
+    under Open: a verifier is checking its fix. Do raise a new defect the fix
+    introduced, at the same location or elsewhere — that is exactly what the
+    delta review is for.
 
 ### Self-check before emitting each finding
 
@@ -106,6 +130,9 @@ Every finding must survive these rules:
 - [ ] Severity and class follow the rubric below, not intuition.
 - [ ] The fix is concrete, and I checked it would not break another caller.
 - [ ] It is my topic and at or above the level floor.
+- [ ] Re-review only: it is in the delta, or the delta changes its behavior,
+      or it is failure class at Critical or High; and it does not match a
+      Dropped, Accepted, or Open entry in the record (rule 11).
 
 If any box is unchecked: fix it, demote it to a QUESTION, or drop it.
 

@@ -3,16 +3,20 @@ name: code-review
 description: >-
   Interactive, level-calibrated, adversarial multi-agent review of code
   changes — the final gate before production. Invoked as a command
-  (/core:code-review [hotfix|basic|extended] [target]). Asks the review level,
-  then runs two independent reviewers per topic — Architecture, Reusability,
-  Safety, Scalability, Simplicity, Security, Tests — that cross-examine each
-  other's findings against the code; contested claims go to adversarial
-  verifiers and every surviving claim is re-checked before it is reported.
-  Hotfix covers only what can make production fail; Basic covers all topics
-  without nits; Extended adds nits. Reports each issue with location, evidence,
-  and a concrete fix. Triggers: "/core:code-review", "review my changes", "review
-  this code", "review before PR", "check the diff for issues", "review this
-  branch", "review PR #123".
+  (/core:code-review [hotfix|basic|extended] [target] [full]). Asks the review
+  level, then runs two independent reviewers per topic — Architecture,
+  Reusability, Safety, Scalability, Simplicity, Security, Tests — that
+  cross-examine each other's findings against the code; contested claims go to
+  adversarial verifiers and every surviving claim is re-checked before it is
+  reported. Hotfix covers only what can make production fail; Basic covers all
+  topics without nits; Extended adds nits. Reports each issue with location,
+  evidence, and a concrete fix. A second run on the same branch is a
+  re-review: it verifies that the recorded issues are fixed and reviews only
+  what changed since the last reviewed head, so fix cycles converge instead of
+  re-sampling the whole branch. Triggers: "/core:code-review", "review my
+  changes", "review this code", "review before PR", "check the diff for
+  issues", "review this branch", "review PR #123", "re-review", "review my
+  fixes".
 ---
 
 # Code review
@@ -52,6 +56,42 @@ Scalability, `SIM` Simplicity, `SEC` Security, `TST` Tests. Agents:
 Legacy level names map as: `quick`, `medium` → **Basic**; `extensive` →
 **Extended**.
 
+## Full review and re-review
+
+A **full review** reads the whole change against its base. A **re-review** is
+the second and later run on the same branch after fixes: it reads only what
+changed since the last reviewed head, and verifies that every issue the last
+report raised is actually resolved. Re-reviewing the whole branch after each
+fix never converges — every run re-samples the long tail of marginal findings
+on code that already passed, and the fixes themselves are fresh code that
+yields fresh findings. The delta shrinks each cycle; the whole branch does not.
+
+The link between runs is the **review record**: one file per branch, outside
+the working tree, written in step 9 and read in step 1. Location:
+`$(git rev-parse --git-common-dir)/code-review/<branch-slug>.md`, where
+`<branch-slug>` is the branch name with `/` replaced by `--` (for a PR target,
+the PR's head branch). It is never committed and never part of the diff.
+
+The mode is decided in step 1:
+
+- **Re-review** when a record exists for the branch, its `Head` SHA is an
+  ancestor of the head under review (`git merge-base --is-ancestor <recorded>
+  <head>`), and the requested level is at or below the record's level.
+- **Full** otherwise: no record; the branch was rebased or amended past the
+  recorded head; a higher level than recorded (the untouched code was never
+  reviewed for the added topics or classes); or the user passed `full`. A full
+  review starts a fresh record.
+
+State the mode and the reason before dispatching. A re-review does not lower
+the bar: the delta is reviewed at the full level, recorded issues keep their
+severity until a verifier confirms the fix, and a Critical or High failure
+found on untouched code still blocks (protocol rule 4).
+
+The record keys on a commit, so uncommitted changes that a run reviewed are
+inside the next delta again. If the tree is dirty at review time, say so and
+suggest committing the fixes first; proceed if the user prefers, and expect
+those hunks to be re-reviewed.
+
 ## 0. Prepare
 
 1. Load `code-review-protocol` with the Skill tool. You parse every reviewer
@@ -61,6 +101,9 @@ Legacy level names map as: `quick`, `medium` → **Basic**; `extensive` →
    fallback in step 4.
 3. Confirm this is a git repository (`git rev-parse --show-toplevel`). If not,
    stop and say so.
+4. Look for the review record at the path above. If it exists, read it: its
+   `Head`, `Level`, and `Open` issues decide the mode and the extra work in
+   steps 1, 3, 5, and 9.
 
 ## 1. Scope the change and build the packet
 
@@ -83,6 +126,11 @@ From the arguments, else the default:
   (or `A`) to the branch tip (or `B`).
 - **Path** (`src/Billing`) — any of the above, limited to `-- <path>`.
 
+Then decide the mode per "Full review and re-review". In re-review mode the
+diff under review is the **delta**: `DELTA_BASE=<recorded Head SHA>`, diffed
+to the same head and with the same uncommitted and untracked additions as the
+default target. The full change (`$BASE` to head) is still built, as context.
+
 If the head under review is **not the current working tree** (a PR or branch
 not checked out, a range ending before HEAD), the reviewers would read the
 wrong files. Create a detached worktree at that head inside the packet —
@@ -97,23 +145,31 @@ Create a uniquely named packet directory —
 directory, else `mktemp -d` — never a fixed name: concurrent reviews would
 overwrite each other's packet. Use that exact path in every brief. Write:
 
-- **`diff.patch`** — the full diff. For the default target: `git diff $BASE`
-  (committed + staged + unstaged, tracked files), then append every untracked,
-  non-ignored file (`git ls-files --others --exclude-standard`) as
+- **`diff.patch`** — the diff under review. For the default target: `git diff
+  $BASE` (committed + staged + unstaged, tracked files), then append every
+  untracked, non-ignored file (`git ls-files --others --exclude-standard`) as
   `git diff --no-index /dev/null <file>` (exit status 1 is normal there).
   Untracked files are the most commonly missed part of a review — include them.
+  In re-review mode, build it the same way from `$DELTA_BASE` instead.
+- **`full.patch`** — re-review only: the whole change, `$BASE` to head, built
+  the same way. Reviewers read it to understand the change; findings come from
+  `diff.patch` (protocol rule 4).
+- **`previous-review.md`** — re-review only: a verbatim copy of the review
+  record.
 - **`files.txt`** — each changed file with status (A/M/D/R) and added/removed
   line counts (`git diff --numstat` plus the untracked files), then an
   **Excluded** list with reasons: lockfiles, generated or minified files,
   vendored code, binaries. Lockfiles are excluded from line review, but any
   dependency change (manifest or lockfile) is listed under **Dependency
-  changes** with package and version.
+  changes** with package and version. In re-review mode, list the delta files.
 - **`intent.md`** — what the change is meant to do: anything the user said,
   commit subjects and bodies (`git log --format='%h %s%n%b' $BASE..<head>`),
   the PR title and body if a PR exists (`gh pr view` — skip silently if `gh` is
   unavailable), the ticket id from the branch name. If no intent can be found
-  and the session is interactive, ask the user for one sentence in step 2.
-- **`meta.md`** — level, active topics, repository root to read post-change
+  and the session is interactive, ask the user for one sentence in step 2. In
+  re-review mode, mark the commits after the recorded head as the fix commits.
+- **`meta.md`** — mode (full or re-review, with the recorded head SHA and the
+  record path), level, active topics, repository root to read post-change
   files from (the repo root or the packet worktree), base and head refs/SHAs,
   the exact command that reproduces the diff, the detected stack (e.g.
   `composer.json` with Symfony → `symfony-stack`; `pyproject.toml` →
@@ -124,8 +180,10 @@ overwrite each other's packet. Use that exact path in every brief. Write:
   repository root reviewers read from, taken before any reviewer is dispatched.
   Step 9 compares against it.
 
-Stop if the diff is empty. If it is very large (above ~3,000 changed lines
-excluding exclusions), tell the user before dispatching: a review that cannot
+Stop if the diff is empty. In re-review mode an empty delta with recorded Open
+issues means nothing was fixed: say so and stop. If the diff is very large
+(above ~3,000 changed lines excluding exclusions), tell the user before
+dispatching: a review that cannot
 read everything degrades into sampling. Offer to split it by directory or
 commit; proceed whole only if they choose to — reviewers will report coverage
 limits honestly.
@@ -143,7 +201,8 @@ and the intent sentence if those are open:
 - **Extended** — all seven topics, plus non-blocking nits.
 
 In a non-interactive session with no level given, use **Basic** and state that
-in the report.
+in the report. In re-review mode, the record's level is the default and the
+recommended option; a higher level turns the run into a full review.
 
 ## 3. Round 1 — dispatch the pairs
 
@@ -162,9 +221,40 @@ You are the <Topic> reviewer, role <A|B>, round 1 of a code-review debate.
 Packet: <packet path> — read meta.md, intent.md, files.txt, and diff.patch first.
 Post-change files are under: <repository root or worktree path>.
 Level: <hotfix|basic|extended>.
+Mode: <full | re-review — diff.patch is the delta since <recorded head SHA>;
+full.patch is the whole change and previous-review.md the record>.
 Follow code-review-protocol: your role's route, the evidence rules, the level
 floor for your topic, and the Round 1 format. Do not modify anything.
 ```
+
+**Re-review: verify the recorded issues in the same batch.** For every issue
+under **Open** in the record, dispatch one `verifier` alongside the pairs
+(Critical: two). The pairs judge the delta; the verifiers judge the fixes. A
+recorded issue changes state only on a verifier verdict — never because a
+reviewer did not mention it, and never because the diff touches its line.
+Brief:
+
+```
+Claim: the issue below is resolved at the head under review — the defect can
+no longer occur, and the fix did not merely move it.
+Issue (from the previous review, verbatim): <ID, severity, class, location,
+code, issue, scenario/cost, fix as reported>
+Packet: <path>; the fix commits are in diff.patch; post-change files under
+<root>. Level: <level>.
+Check the cited location in the post-change file and the fix in the delta. A
+resolution counts only if the scenario (failure class) or the cost (quality
+class) no longer applies; a fix that is absent, partial, or reintroduces the
+defect elsewhere refutes the claim. Run the existing tests that cover it when
+you safely can. Do not modify anything.
+```
+
+| Verifier result | State | Report |
+|---|---|---|
+| CONFIRMED (both, for Critical) | **Resolved** | listed under "Previously reported" |
+| REFUTED (any) | **Still open** | reported again as an issue, original ID and severity, with the verifier's evidence; counts toward the verdict |
+| INCONCLUSIVE, or split | **Unconfirmed** | under "Needs author confirmation"; Critical/High there forces Fix first |
+
+A new defect the fix introduced is the pairs' finding, not the verifier's.
 
 Wait for every agent to finish. Never summarize or predict an agent's result
 before it arrives.
@@ -243,6 +333,8 @@ one state:
 | No verdict after one re-ask | **Contested** |
 | Single-reviewer topic (agent failure) | **Contested** |
 | Dropped **only** because it belongs to another topic (`OUT-OF-SCOPE` — other topic) | **Re-routed** — if that topic is active at this level, the finding goes to adjudication (step 6) under the owning topic, since that topic's pair never debated it; it is never lost to a topic boundary |
+| Re-review: matches an item under **Dropped** or **Accepted by author** in the record (same claim at the same code, whatever the line number now is) and cites no evidence that answers the recorded reason | **Dropped** — recorded; the record's reason is the drop reason |
+| Re-review: matches an item under **Open** in the record | **Dropped** — duplicate of a recorded issue; its state comes from the step-3 verifier, not from the debate |
 
 Keep every dropped finding and its reason for the debate summary — you do not
 report them as issues.
@@ -311,12 +403,14 @@ silently and never keep one you could not check.
   issue rated by a calibration row that requires a question to the author has
   that question under Questions. A ledger entry with no issue, a count that
   does not match, or a missing required question is an error: resolve it before
-  reporting.
+  reporting. In re-review mode, every recorded Open issue maps to exactly one
+  of Resolved, Still open, or Unconfirmed, with its verifier verdict.
 
 ## 9. Report
 
 ```
 ## Code review — <Level> · <scope: base..head, N files, +A/−D>
+Mode: <full | re-review of <recorded head>..<head>, N delta files, +A/−D>
 Verdict: <Ship | Fix first | Blocked> — <one-line rationale>
 Critical N · High N · Medium N · Nit N        (Nit only at Extended)
 
@@ -341,10 +435,16 @@ Critical N · High N · Medium N · Nit N        (Nit only at Extended)
 ### Pre-existing (not introduced by this change; not counted)
 - <path:line> — <issue>
 
+### Previously reported                        (re-review only)
+Resolved: <ID> <title> — <path:line> — <verifier evidence, one line>
+Still open: <ID> — reported above
+Unconfirmed: <ID> — under "Needs author confirmation"
+
 ### Review record
 <Topic>: <N reported> · <N dropped in debate> · <N refuted on adjudication> · coverage <full | limits>
 ...
 Debate: <N raised → N reported>; reviewer failures or coverage gaps: <list, or none>
+Previous issues: <N resolved · N still open · N unconfirmed>        (re-review only)
 ```
 
 Omit an empty section, except **Review record**, which is always present: it
@@ -359,6 +459,44 @@ fix, without a follow-up question.
   "Needs author confirmation".
 - **Ship** — nothing above, only nits (Extended) or nothing at all. A Ship
   verdict with coverage gaps says so in its rationale.
+- A still-open recorded issue is an issue like any other: original severity,
+  same rules. A re-review ships when every recorded issue is resolved and the
+  delta is clean — not before.
+
+**Write the review record** at the path from "Full review and re-review"
+(create the directory if needed). Prefix every finding ID with the run number
+so IDs stay unique across runs (`r1-SAF-A1`, `r2-TST-B2`); a still-open issue
+keeps its original prefixed ID. Overwrite the file with:
+
+```
+# Code review record — <branch>
+Level: <level of the last full review>
+Head: <head SHA reviewed by this run>
+Base: <base SHA>
+Mode: <full | re-review> · Date: <ISO date>
+Heads reviewed: <sha of every run, oldest first>
+
+## Open
+<every issue this report lists, in the report's issue format, with its ID>
+
+## Resolved                                   (accumulated across runs)
+<ID> · <title> · <path:line> · resolved at <sha> — <evidence, one line>
+
+## Dropped                                    (accumulated across runs)
+<ID> · <title> · <path:line> · <dropped in debate | refuted on adjudication> — <reason>
+
+## Accepted by author                         (accumulated across runs)
+<ID> · <title> · <path:line> — <the author's reason>
+
+## Needs author confirmation
+<as reported>
+```
+
+A full review writes a fresh record: Open and Needs author confirmation from
+this run, the accumulated sections empty. A re-review carries the accumulated
+sections forward and adds this run's resolutions, drops, and refutations.
+When the user says an issue will not be fixed, move it from Open to Accepted
+by author with their reason, so no later run verifies or re-raises it.
 
 **Clean up**: re-run `git status --porcelain --untracked-files=all` and diff it
 against `tree-state.txt`. Any difference is a reviewer side effect: list each
@@ -383,6 +521,14 @@ worktree remove <path>`). Leave the rest of the packet in the scratchpad.
   reported as "no issues".
 - **Reviewing the wrong snapshot** — reading the working tree while reviewing a
   PR head that is not checked out.
+- **Full review after fixes** — re-reading the whole branch when a record
+  exists; the loop never converges. Use the record and review the delta.
+- **Re-review as a shortcut** — delta scope when the recorded head is not an
+  ancestor or the level is higher than recorded; the untouched code was never
+  reviewed under those conditions.
+- **Assumed resolution** — marking a recorded issue resolved because the delta
+  touches its line, or because no reviewer raised it again. Only a verifier
+  verdict resolves it.
 
 ## Where this fits
 
@@ -393,4 +539,6 @@ the criteria skills (`architecture`, `solid`, `engineering-standards`,
 `database-design`, `integration-build`, `testing`, `verify`, plus the stack
 skills), and settles contested claims with the `verifier` agent
 (`parallel-agents` adversarial-verify pattern). It is the deeper, external pass
-after `feature-delivery`'s self-review.
+after `feature-delivery`'s self-review. The fix cycle — review, fix, re-review
+— is an `iterate` loop: the review record is its state, the shrinking delta
+its progress, and a resolved record with a clean delta its stop condition.
